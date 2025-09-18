@@ -1,0 +1,27 @@
+{
+  "name": "yt-playlist-transcript-summarizer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "yt-summarizer": "bin/run"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js --watch --interval 60 --playlists playlists.md",
+    "check": "node src/index.js --playlists playlists.md",
+    "diagnose": "node src/diagnostics.js"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "googleapis": "^131.0.0",
+    "dotenv": "^16.4.5",
+    "openai": "^4.57.0",
+    "youtube-transcript": "^1.2.1",
+    "youtube-captions-scraper": "^2.0.3",
+    "yt-dlp-exec": "^1.0.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
