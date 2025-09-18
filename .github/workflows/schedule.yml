@@ -5,6 +5,9 @@ on:
     - cron: '0 * * * *' # hourly
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -18,6 +21,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -33,6 +38,50 @@ jobs:
       - name: Run summarizer (single pass)
         run: node src/index.js --playlists playlists.md --min-minutes 25 --limit 1 --context context.md
 
+      - name: Persist state to 'state' branch
+        if: always()
+        env:
+          USE_PAT: ${{ secrets.GH_PAT }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -e
+          # If state doesn't exist, nothing to do
+          if [ ! -f data/state.json ]; then
+            echo "No state.json to persist; skipping."
+            exit 0
+          fi
+
+          # Preserve generated state before switching branches
+          cp data/state.json /tmp/state.json
+
+          # Configure git
+          git config user.name "actions-state-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          # Optionally use PAT if provided (for protected repos); otherwise GITHUB_TOKEN is used by default
+          if [ -n "$USE_PAT" ]; then
+            git remote set-url origin https://x-access-token:$USE_PAT@github.com/$REPO
+          fi
+
+          # Switch to or create 'state' branch
+          git fetch origin || true
+          if git show-ref --verify --quiet refs/remotes/origin/state; then
+            git checkout -B state origin/state
+          else
+            git checkout -b state
+          fi
+
+          # Restore state and commit
+          mkdir -p data
+          cp /tmp/state.json data/state.json
+          git add -f data/state.json
+          if git diff --cached --quiet; then
+            echo "No state changes to commit."
+          else
+            git commit -m "chore(state): update processed state [skip ci]"
+            git push origin state
+          fi
+
       - name: Upload outputs
         if: always()
         uses: actions/upload-artifact@v4
@@ -42,4 +91,3 @@ jobs:
             output
             data/state.json
           if-no-files-found: warn
-
