@@ -1,0 +1,45 @@
+name: Scheduled Summaries
+
+on:
+  schedule:
+    - cron: '0 * * * *' # hourly
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+      NOTION_PARENT_PAGE_ID: ${{ secrets.NOTION_PARENT_PAGE_ID }}
+      MIN_VIDEO_MINUTES: ${{ vars.MIN_VIDEO_MINUTES }}
+      USER_CONTEXT_PATH: context.md
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Diagnostics
+        run: node src/diagnostics.js
+
+      - name: Run summarizer (single pass)
+        run: node src/index.js --playlists playlists.md --min-minutes 25 --limit 1 --context context.md
+
+      - name: Upload outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: summaries-${{ github.run_id }}
+          path: |
+            output
+            data/state.json
+          if-no-files-found: warn
+
