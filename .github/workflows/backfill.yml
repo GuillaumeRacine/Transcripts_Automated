@@ -1,27 +1,21 @@
-name: Scheduled Summaries
+name: Backfill Notion
 
 on:
-  schedule:
-    - cron: '0 * * * *' # hourly
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: scheduled-summaries
+  group: backfill-notion
   cancel-in-progress: false
 
 jobs:
   run:
     runs-on: ubuntu-latest
     env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
       NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
       NOTION_PARENT_PAGE_ID: ${{ secrets.NOTION_PARENT_PAGE_ID }}
-      MIN_VIDEO_MINUTES: ${{ vars.MIN_VIDEO_MINUTES }}
-      USER_CONTEXT_PATH: context.md
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,11 +31,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Diagnostics
-        run: node src/diagnostics.js
-
-      - name: Run summarizer (process all new since baseline)
-        run: node src/index.js --playlists playlists.md --min-minutes 25 --context context.md
+      - name: Backfill existing outputs to Notion
+        run: node src/backfill_notion.js
 
       - name: Persist state to 'state' branch
         if: always()
@@ -50,40 +41,29 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           set -e
-          # If state doesn't exist, nothing to do
           if [ ! -f data/state.json ]; then
             echo "No state.json to persist; skipping."
             exit 0
           fi
-
-          # Preserve generated state before switching branches
           cp data/state.json /tmp/state.json
-
-          # Configure git
           git config user.name "actions-state-bot"
           git config user.email "actions@users.noreply.github.com"
-
-          # Optionally use PAT if provided (for protected repos); otherwise GITHUB_TOKEN is used by default
           if [ -n "$USE_PAT" ]; then
             git remote set-url origin https://x-access-token:$USE_PAT@github.com/$REPO
           fi
-
-          # Switch to or create 'state' branch
           git fetch origin || true
           if git show-ref --verify --quiet refs/remotes/origin/state; then
             git checkout -B state origin/state
           else
             git checkout -b state
           fi
-
-          # Restore state and commit
           mkdir -p data
           cp /tmp/state.json data/state.json
           git add -f data/state.json
           if git diff --cached --quiet; then
             echo "No state changes to commit."
           else
-            git commit -m "chore(state): update processed state [skip ci]"
+            git commit -m "chore(state): backfill update [skip ci]"
             git push origin state
           fi
 
@@ -91,8 +71,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: summaries-${{ github.run_id }}
+          name: backfill-${{ github.run_id }}
           path: |
             output
             data/state.json
           if-no-files-found: warn
+

@@ -1,7 +1,7 @@
 **Overview**
 - Scans YouTube playlists from a `.md` file.
 - Detects new videos, fetches transcripts, summarizes via LLM.
-- Writes Markdown summaries and optionally publishes to Notion.
+- Writes Markdown summaries and automatically create a new formatted page to Notion.
 - Loads secrets from `.env.local`.
 
 **Setup**
@@ -33,13 +33,27 @@ The app extracts any `youtube.com/playlist?list=...` URLs it finds.
 - Or use the bin: `yt-summarizer --playlists playlists.md` (after `npm link`)
 - Dry run (no OpenAI/Notion calls): `node src/index.js --dry-run --playlists playlists.md`
 - Single video: `node src/index.js --video https://www.youtube.com/watch?v=VIDEO_ID`
-- Skip Notion creation: add `--no-notion`
 - Summarize only first N chars (for quick tests): add `--sample 1500`
- - Process only a few items from playlists: add `--limit 1`
- - Minimum video length filter (playlists): `--min-minutes 25` (default 25). Env override: `MIN_VIDEO_MINUTES=25`.
-   - Single video also respects this as a warning gate; override with `--ignore-min-duration` to force processing.
+
+Notion is required. Set `NOTION_TOKEN` and `NOTION_PARENT_PAGE_ID`; processing will abort or retry items if Notion is not available.
+
+**Production**
+- Docker:
+  - Build: `docker build -t yt-summarizer .`
+  - Run: `docker run --rm \
+      -e OPENAI_API_KEY \
+      -e YOUTUBE_API_KEY \
+      -e NOTION_TOKEN \
+      -e NOTION_PARENT_PAGE_ID \
+      -v "$PWD/output":/app/output \
+      -v "$PWD/data":/app/data \
+      yt-summarizer --playlists playlists.md`
+  - The container writes outputs to the mounted `output/` and state to `data/`.
+- GitHub Actions: see `Transcripts_Automated/.github/workflows/schedule.yml` for a scheduled run that persists state and uploads artifacts.
+- Locking: the app uses a lightweight lock file `data/.lock` to avoid overlapping runs in cron/containers.
 
 Outputs are saved to `output/` and processed IDs tracked in `data/state.json`.
+On first run for a playlist, the app processes only the latest published video (as a baseline), even if it is older than 24 hours. After that, it processes only videos with a publication date newer than the stored baseline for that playlist. Older videos (before the baseline) are skipped.
 
 **Notes**
 - YouTube API: Uses Data API v3 `playlistItems.list`. Playlists must be public/unlisted.
@@ -47,4 +61,3 @@ Outputs are saved to `output/` and processed IDs tracked in `data/state.json`.
 - Notion: Creates a callout with video info, a bookmark for the URL, and converts Markdown to headings (H1–H3), bullets, numbered lists, quotes, code blocks, dividers, and paragraphs.
 - Rate limits: Summarization chunks large transcripts before synthesizing.
  - Notion access: Share the parent page with your integration (via the Share menu) so it can create child pages.
- - Filtering: Playlist scans fetch durations and skip videos shorter than the configured minimum. Items with unknown duration are kept.

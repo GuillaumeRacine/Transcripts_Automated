@@ -2,10 +2,11 @@ import './env.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { parseArgs, extractPlaylistUrlsFromMarkdown, ensureDir, sanitizeFilename } from './util.js';
-import { listPlaylistVideos, fetchTranscriptText, getVideoIdFromUrl, getVideoMeta } from './youtube.js';
-import { isProcessed, markProcessed } from './state.js';
+import { listPlaylistVideos, fetchTranscriptText, getVideoIdFromUrl, getVideoMeta, getPlaylistIdFromUrl } from './youtube.js';
+import { isProcessed, markProcessed, getPlaylistLatestPublished, setPlaylistLatestPublished, getProcessed } from './state.js';
 import { summarizeTranscriptFull } from './summarize.js';
 import { createNotionPage, normalizeNotionPageId } from './notion.js';
+import { acquireLock, releaseLock } from './lock.js';
 
 const args = parseArgs(process.argv);
 
@@ -18,7 +19,7 @@ async function main() {
   const intervalMin = Number(args.interval || process.env.POLL_INTERVAL_MINUTES || 60);
   const contextPath = process.env.USER_CONTEXT_PATH || args.context;
   const dryRun = Boolean(args["dry-run"] || args.dryRun);
-  const noNotion = Boolean(args["no-notion"] || args.noNotion);
+  // Notion is attempted automatically when configured; disabling is not supported.
   const videoUrl = args.video || args.v; // single video mode
   const sampleChars = args.sample ? Number(args.sample) : undefined;
   const limit = args.limit ? Number(args.limit) : undefined; // max unprocessed videos to handle per run
@@ -26,6 +27,16 @@ async function main() {
   const ignoreMinDuration = Boolean(args["ignore-min-duration"] || process.env.IGNORE_MIN_DURATION === '1');
 
   await ensureDir('output');
+  // Acquire a simple process lock to prevent concurrent runs in production
+  const gotLock = await acquireLock();
+  if (!gotLock) {
+    console.error('Another instance appears to be running (lock present). Exiting.');
+    process.exitCode = 1;
+    return;
+  }
+  process.on('exit', () => { releaseLock(); });
+  process.on('SIGINT', async () => { await releaseLock(); process.exit(1); });
+  process.on('SIGTERM', async () => { await releaseLock(); process.exit(1); });
 
   if (!process.env.OPENAI_API_KEY) {
     console.error('Missing OPENAI_API_KEY in .env.local');
@@ -41,6 +52,13 @@ async function main() {
     process.exitCode = 1;
     return;
   }
+  if (!process.env.NOTION_TOKEN || !process.env.NOTION_PARENT_PAGE_ID) {
+    console.error('Notion is required: set NOTION_TOKEN and NOTION_PARENT_PAGE_ID in .env.local');
+    console.error('  - Share the parent page with your integration in Notion.');
+    console.error('  - You can paste the page URL or UUID for NOTION_PARENT_PAGE_ID.');
+    process.exitCode = 1;
+    return;
+  }
 
   if (!videoUrl && !(await fileExistsSafe(playlistsPath))) {
     console.error(`Playlists file not found: ${playlistsPath}`);
@@ -50,9 +68,9 @@ async function main() {
 
   const loop = async () => {
     if (videoUrl) {
-      await runSingleVideo({ videoUrl, contextPath, dryRun, noNotion, sampleChars, minMinutes, ignoreMinDuration });
+      await runSingleVideo({ videoUrl, contextPath, dryRun, sampleChars, minMinutes, ignoreMinDuration });
     } else {
-      await runOnce({ playlistsPath, contextPath, dryRun, noNotion, sampleChars, limit, minMinutes });
+      await runOnce({ playlistsPath, contextPath, dryRun, sampleChars, limit, minMinutes });
     }
   };
 
@@ -67,7 +85,7 @@ async function main() {
   }
 }
 
-async function runOnce({ playlistsPath, contextPath, dryRun, noNotion, sampleChars, limit, minMinutes }) {
+async function runOnce({ playlistsPath, contextPath, dryRun, sampleChars, limit, minMinutes }) {
   const md = await fs.readFile(playlistsPath, 'utf8');
   const urls = extractPlaylistUrlsFromMarkdown(md);
   if (!urls.length) {
@@ -81,34 +99,75 @@ async function runOnce({ playlistsPath, contextPath, dryRun, noNotion, sampleCha
     try {
       const items = await listPlaylistVideos(url);
       console.log(`Playlist ${url} has ${items.length} items.`);
+      const playlistId = getPlaylistIdFromUrl(url) || url;
       const minSec = Number.isFinite(minMinutes) ? Math.max(0, minMinutes) * 60 : 25 * 60;
-      const itemsFiltered = items.filter((it) => {
-        if (it.durationSec == null) return true; // keep unknown durations
-        return it.durationSec >= minSec;
-      });
-      const skippedShort = items.length - itemsFiltered.length;
+
+      // Filter by duration if known
+      const eligible = items.filter((it) => (it.durationSec == null) || (it.durationSec >= minSec));
+      const skippedShort = items.length - eligible.length;
       if (skippedShort > 0) {
         console.log(`Skipping ${skippedShort} short videos (< ${Math.round(minSec/60)} min).`);
       }
-      for (const item of items) {
-        if (!itemsFiltered.includes(item)) {
-          const dur = item.durationSec;
-          const mm = typeof dur === 'number' ? Math.floor(dur / 60) : 'unknown';
-          const ss = typeof dur === 'number' ? String(dur % 60).padStart(2, '0') : '';
-          console.log(`Skipping short video: ${item.title} (${item.videoId}) ~ ${mm}${ss ? ':'+ss : ''}`);
-          continue;
+
+      // Determine latest publishedAt in the playlist
+      const toTime = (p) => {
+        if (!p) return NaN;
+        const t = new Date(p).getTime();
+        return Number.isFinite(t) ? t : NaN;
+      };
+      const eligibleWithTime = eligible.filter((it) => Number.isFinite(toTime(it.publishedAt)));
+      const latestItem = eligibleWithTime.reduce((acc, cur) => {
+        return (!acc || toTime(cur.publishedAt) > toTime(acc.publishedAt)) ? cur : acc;
+      }, null);
+      const allWithTime = items.filter((it) => Number.isFinite(toTime(it.publishedAt)));
+      const latestOverall = allWithTime.reduce((acc, cur) => {
+        return (!acc || toTime(cur.publishedAt) > toTime(acc.publishedAt)) ? cur : acc;
+      }, null);
+
+      const baselineIso = await getPlaylistLatestPublished(playlistId);
+      let candidates;
+      if (!baselineIso) {
+        // First run for this playlist: process only the latest video as baseline
+        candidates = latestItem ? [latestItem] : [];
+        if (latestItem) {
+          console.log(`No baseline for playlist yet. Will process latest published video: ${latestItem.title}`);
+        } else {
+          console.log('No eligible items with a valid published date.');
         }
-        if (limit && processedCount >= limit) {
-          console.log(`Reached processing limit (${limit}). Stopping.`);
-          return;
-        }
+      } else {
+        const baselineMs = toTime(baselineIso);
+        candidates = eligibleWithTime.filter((it) => toTime(it.publishedAt) > baselineMs);
+        // Sort by publishedAt ascending so we process in order
+        candidates.sort((a, b) => toTime(a.publishedAt) - toTime(b.publishedAt));
+        console.log(`Baseline for playlist ${playlistId}: ${formatDateYMD(baselineIso)}. New candidates: ${candidates.length}.`);
+      }
+
+      let maxProcessedPub = baselineIso ? new Date(baselineIso).toISOString() : null;
+      for (const item of candidates) {
         const { videoId } = item;
         if (!videoId) continue;
-        if (await isProcessed(videoId)) continue;
+        if (limit && processedCount >= limit) {
+          console.log(`Reached processing limit (${limit}). Stopping.`);
+          break;
+        }
+        if (await isProcessed(videoId)) {
+          // Special case: if this is the first run (no baseline) and this item is the latest
+          // and a prior run only marked it as too_old, allow re-processing now.
+          const prev = await getProcessed(videoId);
+          const isLatest = latestItem && latestItem.videoId === videoId;
+          const wasTooOld = prev && prev.skipped && prev.reason === 'too_old';
+          if (!( !baselineIso && isLatest && wasTooOld )) {
+            continue;
+          }
+        }
 
-        console.log(`Processing new video: ${item.title} (${videoId})`);
+        console.log(`Processing video: ${item.title} (${videoId}) published ${formatDateYMD(item.publishedAt) || 'unknown'}`);
         if (dryRun) {
           console.log('  [dry-run] Would fetch transcript, summarize, write Markdown, and create Notion page.');
+          processedCount++;
+          if (item.publishedAt && (!maxProcessedPub || new Date(item.publishedAt) > new Date(maxProcessedPub))) {
+            maxProcessedPub = new Date(item.publishedAt).toISOString();
+          }
           continue;
         }
         const transcriptFull = await fetchTranscriptText(videoId);
@@ -116,6 +175,9 @@ async function runOnce({ playlistsPath, contextPath, dryRun, noNotion, sampleCha
         if (!transcript) {
           console.warn(`No transcript available for ${videoId}. Skipping.`);
           await markProcessed(videoId, { skipped: true, reason: 'no_transcript' });
+          if (item.publishedAt && (!maxProcessedPub || new Date(item.publishedAt) > new Date(maxProcessedPub))) {
+            maxProcessedPub = new Date(item.publishedAt).toISOString();
+          }
           continue;
         }
         if (sampleChars && Number.isFinite(sampleChars)) {
@@ -130,10 +192,9 @@ async function runOnce({ playlistsPath, contextPath, dryRun, noNotion, sampleCha
 
         const filename = await writeMarkdownOutput(item, summary);
         console.log(`Wrote ${filename}`);
-        processedCount++;
 
-        // Notion publish if configured
-        if (!noNotion && process.env.NOTION_TOKEN && process.env.NOTION_PARENT_PAGE_ID) {
+        // Notion publish (required)
+        if (process.env.NOTION_TOKEN && process.env.NOTION_PARENT_PAGE_ID) {
           const parentId = normalizeNotionPageId(process.env.NOTION_PARENT_PAGE_ID);
           if (!/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(parentId)) {
             console.warn('NOTION_PARENT_PAGE_ID appears invalid. Provide a Notion page URL or a UUID ID.');
@@ -149,17 +210,30 @@ async function runOnce({ playlistsPath, contextPath, dryRun, noNotion, sampleCha
             });
             console.log(`Created Notion page: ${page?.url || page?.id}`);
             await markProcessed(videoId, { output: filename, notion_page_id: page?.id });
+            processedCount++;
+            if (item.publishedAt && (!maxProcessedPub || new Date(item.publishedAt) > new Date(maxProcessedPub))) {
+              maxProcessedPub = new Date(item.publishedAt).toISOString();
+            }
           } catch (e) {
             console.warn(`Failed to create Notion page: ${e.message}`);
             console.warn('  Troubleshooting:');
             console.warn('   - Ensure NOTION_TOKEN is for an internal integration.');
             console.warn('   - Share the parent page with the integration (Notion Share menu).');
             console.warn('   - Verify NOTION_PARENT_PAGE_ID is the correct parent page.');
-            await markProcessed(videoId, { output: filename, notion_error: e.message });
+            // Do not mark processed on Notion failure to allow retry later
           }
         } else {
-          await markProcessed(videoId, { output: filename });
+          // This branch should not happen due to startup guard
+          console.warn('Notion is not configured (missing NOTION_TOKEN or NOTION_PARENT_PAGE_ID). Aborting item.');
         }
+      }
+      // If no baseline existed and nothing updated maxProcessedPub, set to latest OVERALL publishedAt
+      if (!baselineIso && !maxProcessedPub && latestOverall?.publishedAt) {
+        maxProcessedPub = new Date(latestOverall.publishedAt).toISOString();
+      }
+      // Update playlist baseline if we have a value
+      if (maxProcessedPub) {
+        await setPlaylistLatestPublished(playlistId, maxProcessedPub);
       }
     } catch (e) {
       console.warn(`Failed playlist ${url}: ${e.message}`);
@@ -167,7 +241,7 @@ async function runOnce({ playlistsPath, contextPath, dryRun, noNotion, sampleCha
   }
 }
 
-async function runSingleVideo({ videoUrl, contextPath, dryRun, noNotion, sampleChars, minMinutes, ignoreMinDuration }) {
+async function runSingleVideo({ videoUrl, contextPath, dryRun, sampleChars, minMinutes, ignoreMinDuration }) {
   const videoId = getVideoIdFromUrl(videoUrl) || videoUrl;
   if (!videoId) {
     console.error('Could not parse video ID from URL:', videoUrl);
@@ -201,6 +275,15 @@ async function runSingleVideo({ videoUrl, contextPath, dryRun, noNotion, sampleC
     await markProcessed(videoId, { skipped: true, reason: 'too_short', duration_sec: meta.durationSec });
     return;
   }
+  // Published-time gate: only process if published within the last 24 hours
+  const cutoffMs = Date.now() - 24 * 60 * 60 * 1000; // 24 hours
+  const pubMs = meta.publishedAt ? new Date(meta.publishedAt).getTime() : NaN;
+  if (!Number.isFinite(pubMs) || pubMs < cutoffMs) {
+    const pub = formatDateYMD(meta.publishedAt) || 'unknown';
+    console.log(`Skipping old video (>24h): ${meta.title} (${videoId}) published ${pub}`);
+    await markProcessed(videoId, { skipped: true, reason: 'too_old', published_at: meta.publishedAt || null });
+    return;
+  }
   console.log(`Processing single video: ${meta.title} (${videoId})`);
   const transcriptFull = await fetchTranscriptText(videoId);
   if (!transcriptFull) {
@@ -212,7 +295,7 @@ async function runSingleVideo({ videoUrl, contextPath, dryRun, noNotion, sampleC
   const summary = await summarizeTranscriptFull(transcript, { title: meta.title, author: meta.author, url: meta.url }, { contextPath });
   const filename = await writeMarkdownOutput({ ...meta }, summary);
   console.log('Wrote', filename);
-  if (!noNotion && process.env.NOTION_TOKEN && process.env.NOTION_PARENT_PAGE_ID) {
+  if (process.env.NOTION_TOKEN && process.env.NOTION_PARENT_PAGE_ID) {
     const parentId = normalizeNotionPageId(process.env.NOTION_PARENT_PAGE_ID);
     if (!/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(parentId)) {
       console.warn('NOTION_PARENT_PAGE_ID appears invalid. Provide a Notion page URL or a UUID ID.');
@@ -228,10 +311,11 @@ async function runSingleVideo({ videoUrl, contextPath, dryRun, noNotion, sampleC
       console.warn('   - Ensure NOTION_TOKEN is for an internal integration.');
       console.warn('   - Share the parent page with the integration (Notion Share menu).');
       console.warn('   - Verify NOTION_PARENT_PAGE_ID is the correct parent page.');
-      await markProcessed(videoId, { output: filename, notion_error: e.message });
+      // Do not mark processed on Notion failure to allow retry later
     }
   } else {
-    await markProcessed(videoId, { output: filename });
+    console.warn('Notion is not configured (missing NOTION_TOKEN or NOTION_PARENT_PAGE_ID). Skipping Notion publish.');
+    // Do not mark processed if Notion is required
   }
 }
 
@@ -239,7 +323,7 @@ async function writeMarkdownOutput(item, summary) {
   const dateStr = formatDateYMD(item.publishedAt) || new Date().toISOString().slice(0, 10);
   const base = `${dateStr} - ${sanitizeFilename(item.author || 'Unknown')} - ${sanitizeFilename(item.title)} (${item.videoId}).md`;
   const outPath = path.join('output', base);
-  const header = `# ${item.title}\n\n- Channel: ${item.author || 'Unknown'}\n- URL: ${item.url}\n- Video ID: ${item.videoId}\n- Published: ${formatDateYMD(item.publishedAt) || 'unknown'}\n- Generated: ${new Date().toISOString()}\n\n`;
+  const header = `# ${item.title}\n\n- Channel: ${item.author || 'Unknown'}\n- URL: ${item.url}\n- Video ID: ${item.videoId}\n- Published: ${formatDateYMD(item.publishedAt) || 'unknown'}\n\n`;
   await fs.writeFile(outPath, header + summary, 'utf8');
   return outPath;
 }

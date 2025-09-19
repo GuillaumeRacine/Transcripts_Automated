@@ -10,7 +10,8 @@
     "start": "node src/index.js",
     "dev": "node src/index.js --watch --interval 60 --playlists playlists.md",
     "check": "node src/index.js --playlists playlists.md",
-    "diagnose": "node src/diagnostics.js"
+    "diagnose": "node src/diagnostics.js",
+    "backfill": "node src/backfill_notion.js"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.15",

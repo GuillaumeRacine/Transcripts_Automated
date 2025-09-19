@@ -17,7 +17,7 @@ function iso8601DurationToSeconds(iso) {
   return h * 3600 + mi * 60 + s;
 }
 
-function getPlaylistIdFromUrl(url) {
+export function getPlaylistIdFromUrl(url) {
   try {
     const u = new URL(url);
     return u.searchParams.get('list');
