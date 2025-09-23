@@ -24,6 +24,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Restore previous state (if any)
+        run: |
+          set -e
+          git fetch origin state || true
+          if git show-ref --verify --quiet refs/remotes/origin/state; then
+            git restore --source=origin/state --worktree --staged -- data/state.json || true
+            if [ -f data/state.json ]; then
+              echo "Restored previous data/state.json from state branch"
+            else
+              echo "No previous state.json found in state branch"
+            fi
+          fi
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -54,6 +67,12 @@ jobs:
           # Preserve generated state before switching branches
           cp data/state.json /tmp/state.json
 
+          # Also stage any Markdown outputs (if present)
+          if [ -d output ]; then
+            mkdir -p /tmp/output
+            rsync -a --include '*/' --include '*.md' --exclude '*' output/ /tmp/output/
+          fi
+
           # Configure git
           git config user.name "actions-state-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -74,7 +93,14 @@ jobs:
           # Restore state and commit
           mkdir -p data
           cp /tmp/state.json data/state.json
+          if [ -d /tmp/output ]; then
+            mkdir -p output
+            rsync -a /tmp/output/ output/
+          fi
           git add -f data/state.json
+          if [ -d output ]; then
+            git add -f output/*.md || true
+          fi
           if git diff --cached --quiet; then
             echo "No state changes to commit."
           else
