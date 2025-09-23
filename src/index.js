@@ -174,7 +174,7 @@ async function runOnce({ playlistsPath, contextPath, dryRun, sampleChars, limit,
         let transcript = transcriptFull;
         if (!transcript) {
           console.warn(`No transcript available for ${videoId}. Skipping.`);
-          await markProcessed(videoId, { skipped: true, reason: 'no_transcript' });
+          await markProcessed(videoId, { skipped: true, reason: 'no_transcript', playlist_id: playlistId });
           if (item.publishedAt && (!maxProcessedPub || new Date(item.publishedAt) > new Date(maxProcessedPub))) {
             maxProcessedPub = new Date(item.publishedAt).toISOString();
           }
@@ -209,7 +209,7 @@ async function runOnce({ playlistsPath, contextPath, dryRun, sampleChars, limit,
               meta: { url: item.url, channel: item.author, videoId: item.videoId },
             });
             console.log(`Created Notion page: ${page?.url || page?.id}`);
-            await markProcessed(videoId, { output: filename, notion_page_id: page?.id });
+            await markProcessed(videoId, { output: filename, notion_page_id: page?.id, playlist_id: playlistId });
             processedCount++;
             if (item.publishedAt && (!maxProcessedPub || new Date(item.publishedAt) > new Date(maxProcessedPub))) {
               maxProcessedPub = new Date(item.publishedAt).toISOString();
