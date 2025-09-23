@@ -22,7 +22,12 @@ jobs:
       NOTION_PARENT_PAGE_ID: ${{ secrets.NOTION_PARENT_PAGE_ID }}
       MIN_VIDEO_MINUTES: ${{ vars.MIN_VIDEO_MINUTES }}
       USER_CONTEXT_PATH: context.md
+      HEALTHCHECKS_URL: ${{ secrets.HEALTHCHECKS_URL }}
     steps:
+      - name: Healthcheck start (optional)
+        if: ${{ env.HEALTHCHECKS_URL != '' }}
+        run: |
+          curl -fsS --retry 2 "$HEALTHCHECKS_URL/start" || true
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -58,6 +63,11 @@ jobs:
 
           # Preserve generated state before switching branches
           cp data/state.json /tmp/state.json
+          if [ -d output ]; then
+            mkdir -p /tmp/output
+            # copy markdown outputs; ignore temp/system files (no delete to preserve history)
+            rsync -a --include '*/' --include '*.md' --exclude '*' output/ /tmp/output/
+          fi
 
           # Configure git
           git config user.name "actions-state-bot"
@@ -79,7 +89,14 @@ jobs:
           # Restore state and commit
           mkdir -p data
           cp /tmp/state.json data/state.json
+          if [ -d /tmp/output ]; then
+            mkdir -p output
+            rsync -a /tmp/output/ output/
+          fi
           git add -f data/state.json
+          if [ -d output ]; then
+            git add -f output/*.md || true
+          fi
           if git diff --cached --quiet; then
             echo "No state changes to commit."
           else
@@ -96,3 +113,13 @@ jobs:
             output
             data/state.json
           if-no-files-found: warn
+
+      - name: Healthcheck success (optional)
+        if: ${{ success() && env.HEALTHCHECKS_URL != '' }}
+        run: |
+          curl -fsS --retry 2 "$HEALTHCHECKS_URL" || true
+
+      - name: Healthcheck failure (optional)
+        if: ${{ failure() && env.HEALTHCHECKS_URL != '' }}
+        run: |
+          curl -fsS --retry 2 "$HEALTHCHECKS_URL/fail" || true
