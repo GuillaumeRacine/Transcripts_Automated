@@ -1,55 +1,55 @@
 {
   "processed": {
     "cpKsogGdem4": {
-      "when": "2025-10-20T11:01:24.019Z",
+      "when": "2025-10-20T12:01:28.913Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW"
     },
     "HvEg37B4DU4": {
-      "when": "2025-10-20T11:01:28.148Z",
+      "when": "2025-10-20T12:01:33.610Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLkkA1LPpvlkjbuctKTaViIeIiZljzbqxW"
     },
     "vPDUBXmZzow": {
-      "when": "2025-10-20T11:01:33.451Z",
+      "when": "2025-10-20T12:01:39.109Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLW0NGgv1qnfzRbBVRUFWxAwJbU1v5ET_R"
     },
     "qGUVtU5g1MI": {
-      "when": "2025-10-20T11:01:40.368Z",
+      "when": "2025-10-20T12:01:45.348Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLmkdAgtxf3ahEmMWNY52BX3t1o7vb4aN5"
     },
     "brOw1p7rPyY": {
-      "when": "2025-10-20T11:01:49.179Z",
+      "when": "2025-10-20T12:01:53.342Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLNlNx9Di_AxuSvXu4xRiy6qfx8KY-J-C9"
     },
     "xaeafKPfs1M": {
-      "when": "2025-10-20T11:01:54.609Z",
+      "when": "2025-10-20T12:01:58.399Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLcdXvEekPv1GRqbvjVf41TrYQhjHRO1_q"
     },
     "lXUZvyajciY": {
-      "when": "2025-10-20T11:01:59.567Z",
+      "when": "2025-10-20T12:02:03.256Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLd7-bHaQwnthaNDpZ32TtYONGVk95-fhF"
     },
     "amg650_rfxA": {
-      "when": "2025-10-20T11:02:05.809Z",
+      "when": "2025-10-20T12:02:09.200Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PL3FW7Lu3i5JvBYuJvDuDZliJFv9ZDmKs_"
     },
     "wRKN6bTEyHk": {
-      "when": "2025-10-20T11:02:17.993Z",
+      "when": "2025-10-20T12:02:20.515Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLBEIBBdgAOArw0ljqpJoywBxXtSrkqVCt"
@@ -57,7 +57,7 @@
   },
   "playlists": {
     "PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW": {
-      "latest_published_at": "2025-10-20T04:43:19.000Z"
+      "latest_published_at": "2025-10-20T12:01:12.000Z"
     },
     "PLkkA1LPpvlkjbuctKTaViIeIiZljzbqxW": {
       "latest_published_at": "2025-10-15T14:00:26.000Z"
