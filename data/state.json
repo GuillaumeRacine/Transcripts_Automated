@@ -1,49 +1,55 @@
 {
   "processed": {
     "VnPQ4mLRG-c": {
-      "when": "2025-12-08T17:02:57.825Z",
+      "when": "2025-12-08T18:01:14.741Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW"
     },
     "60tqqKllFH4": {
-      "when": "2025-12-08T17:03:02.211Z",
+      "when": "2025-12-08T18:01:18.738Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLkkA1LPpvlkjbuctKTaViIeIiZljzbqxW"
     },
+    "GmA49M9HwYA": {
+      "when": "2025-12-08T18:01:24.153Z",
+      "skipped": true,
+      "reason": "no_transcript",
+      "playlist_id": "PLW0NGgv1qnfzRbBVRUFWxAwJbU1v5ET_R"
+    },
     "cVNgtVmr6m8": {
-      "when": "2025-12-08T17:03:15.498Z",
+      "when": "2025-12-08T18:01:29.887Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLmkdAgtxf3ahEmMWNY52BX3t1o7vb4aN5"
     },
     "9hHAuPRdHws": {
-      "when": "2025-12-08T17:03:25.184Z",
+      "when": "2025-12-08T18:01:38.096Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLNlNx9Di_AxuSvXu4xRiy6qfx8KY-J-C9"
     },
     "MkNjs5vbG9M": {
-      "when": "2025-12-08T17:03:30.814Z",
+      "when": "2025-12-08T18:01:43.454Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLcdXvEekPv1GRqbvjVf41TrYQhjHRO1_q"
     },
     "aR20FWCCjAs": {
-      "when": "2025-12-08T17:03:36.140Z",
+      "when": "2025-12-08T18:01:48.372Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLd7-bHaQwnthaNDpZ32TtYONGVk95-fhF"
     },
     "Er59O3vTcRs": {
-      "when": "2025-12-08T17:03:42.900Z",
+      "when": "2025-12-08T18:01:54.103Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PL3FW7Lu3i5JvBYuJvDuDZliJFv9ZDmKs_"
     },
     "NQUYGBnQiBk": {
-      "when": "2025-12-08T17:03:54.368Z",
+      "when": "2025-12-08T18:02:04.486Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLBEIBBdgAOArw0ljqpJoywBxXtSrkqVCt"
@@ -55,6 +61,9 @@
     },
     "PLkkA1LPpvlkjbuctKTaViIeIiZljzbqxW": {
       "latest_published_at": "2025-12-04T13:00:21.000Z"
+    },
+    "PLW0NGgv1qnfzRbBVRUFWxAwJbU1v5ET_R": {
+      "latest_published_at": "2025-12-05T16:25:40.000Z"
     },
     "PLmkdAgtxf3ahEmMWNY52BX3t1o7vb4aN5": {
       "latest_published_at": "2025-12-08T12:16:05.000Z"
