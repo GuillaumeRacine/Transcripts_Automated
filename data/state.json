@@ -1,55 +1,49 @@
 {
   "processed": {
     "zYuw-8pwnp8": {
-      "when": "2025-12-18T13:12:27.708Z",
+      "when": "2025-12-18T14:01:50.295Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW"
     },
     "EATx9mFoPUI": {
-      "when": "2025-12-18T13:12:31.864Z",
+      "when": "2025-12-18T14:01:54.707Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLkkA1LPpvlkjbuctKTaViIeIiZljzbqxW"
     },
     "tiJswpzcZQE": {
-      "when": "2025-12-18T13:12:37.480Z",
+      "when": "2025-12-18T14:01:59.892Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLW0NGgv1qnfzRbBVRUFWxAwJbU1v5ET_R"
     },
     "-hU4fV-Ezj4": {
-      "when": "2025-12-18T13:12:44.030Z",
+      "when": "2025-12-18T14:02:06.466Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLmkdAgtxf3ahEmMWNY52BX3t1o7vb4aN5"
     },
     "9hHAuPRdHws": {
-      "when": "2025-12-18T13:12:53.086Z",
+      "when": "2025-12-18T14:02:15.415Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLNlNx9Di_AxuSvXu4xRiy6qfx8KY-J-C9"
     },
     "4eLltX-3G-w": {
-      "when": "2025-12-18T13:12:58.075Z",
+      "when": "2025-12-18T14:02:20.610Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLcdXvEekPv1GRqbvjVf41TrYQhjHRO1_q"
     },
     "aR20FWCCjAs": {
-      "when": "2025-12-18T13:13:02.888Z",
+      "when": "2025-12-18T14:02:26.192Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLd7-bHaQwnthaNDpZ32TtYONGVk95-fhF"
     },
-    "OBamRKAI7hA": {
-      "when": "2025-12-18T13:13:08.748Z",
-      "skipped": true,
-      "reason": "no_transcript",
-      "playlist_id": "PL3FW7Lu3i5JvBYuJvDuDZliJFv9ZDmKs_"
-    },
     "qp3vAbW750I": {
-      "when": "2025-12-18T13:13:21.214Z",
+      "when": "2025-12-18T14:02:45.574Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLBEIBBdgAOArw0ljqpJoywBxXtSrkqVCt"
@@ -76,9 +70,6 @@
     },
     "PLd7-bHaQwnthaNDpZ32TtYONGVk95-fhF": {
       "latest_published_at": "2025-11-25T17:29:11.000Z"
-    },
-    "PL3FW7Lu3i5JvBYuJvDuDZliJFv9ZDmKs_": {
-      "latest_published_at": "2025-12-12T15:27:41.000Z"
     },
     "PLBEIBBdgAOArw0ljqpJoywBxXtSrkqVCt": {
       "latest_published_at": "2025-12-09T11:01:42.000Z"
