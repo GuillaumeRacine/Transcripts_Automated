@@ -1,55 +1,55 @@
 {
   "processed": {
     "RmwbNdyrilk": {
-      "when": "2026-01-15T14:02:52.727Z",
+      "when": "2026-01-15T15:01:57.725Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW"
     },
     "9RGFp0cNRkU": {
-      "when": "2026-01-15T14:02:55.206Z",
+      "when": "2026-01-15T15:02:02.068Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLkkA1LPpvlkjbuctKTaViIeIiZljzbqxW"
     },
     "gJ5z-S4RSuo": {
-      "when": "2026-01-15T14:03:01.259Z",
+      "when": "2026-01-15T15:02:07.403Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLW0NGgv1qnfzRbBVRUFWxAwJbU1v5ET_R"
     },
     "o1dHXx5R1bY": {
-      "when": "2026-01-15T14:03:09.375Z",
+      "when": "2026-01-15T15:02:13.940Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLmkdAgtxf3ahEmMWNY52BX3t1o7vb4aN5"
     },
-    "ilrstCbOBog": {
-      "when": "2026-01-15T14:03:19.901Z",
+    "nZDx2DHCtv8": {
+      "when": "2026-01-15T15:02:22.862Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLNlNx9Di_AxuSvXu4xRiy6qfx8KY-J-C9"
     },
     "7IIVtHgJVqU": {
-      "when": "2026-01-15T14:03:25.799Z",
+      "when": "2026-01-15T15:02:28.319Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLcdXvEekPv1GRqbvjVf41TrYQhjHRO1_q"
     },
     "_9V_Hbe-N1A": {
-      "when": "2026-01-15T14:03:31.325Z",
+      "when": "2026-01-15T15:02:32.916Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLd7-bHaQwnthaNDpZ32TtYONGVk95-fhF"
     },
     "h0bQSQv29FE": {
-      "when": "2026-01-15T14:03:38.938Z",
+      "when": "2026-01-15T15:02:38.910Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PL3FW7Lu3i5JvBYuJvDuDZliJFv9ZDmKs_"
     },
     "TuRwrHO37cI": {
-      "when": "2026-01-15T14:03:53.684Z",
+      "when": "2026-01-15T15:02:50.952Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLBEIBBdgAOArw0ljqpJoywBxXtSrkqVCt"
@@ -60,7 +60,7 @@
       "latest_published_at": "2026-01-15T13:00:59.000Z"
     },
     "PLkkA1LPpvlkjbuctKTaViIeIiZljzbqxW": {
-      "latest_published_at": "2026-01-15T01:28:37.000Z"
+      "latest_published_at": "2026-01-15T15:00:16.000Z"
     },
     "PLW0NGgv1qnfzRbBVRUFWxAwJbU1v5ET_R": {
       "latest_published_at": "2025-12-23T20:32:34.000Z"
@@ -69,7 +69,7 @@
       "latest_published_at": "2026-01-12T11:31:00.000Z"
     },
     "PLNlNx9Di_AxuSvXu4xRiy6qfx8KY-J-C9": {
-      "latest_published_at": "2026-01-12T11:01:30.000Z"
+      "latest_published_at": "2026-01-15T11:01:29.000Z"
     },
     "PLcdXvEekPv1GRqbvjVf41TrYQhjHRO1_q": {
       "latest_published_at": "2026-01-13T14:00:22.000Z"
