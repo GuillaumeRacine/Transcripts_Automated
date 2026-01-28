@@ -1,58 +1,52 @@
 {
   "processed": {
     "lEULFeUVYf0": {
-      "when": "2026-01-28T19:05:37.242Z",
+      "when": "2026-01-28T20:02:04.095Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW"
     },
     "9RGFp0cNRkU": {
-      "when": "2026-01-28T19:05:41.254Z",
+      "when": "2026-01-28T20:02:08.415Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLkkA1LPpvlkjbuctKTaViIeIiZljzbqxW"
     },
     "V4h_VSzLxCk": {
-      "when": "2026-01-28T19:05:46.039Z",
+      "when": "2026-01-28T20:02:13.595Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLW0NGgv1qnfzRbBVRUFWxAwJbU1v5ET_R"
     },
     "Vii3Pvfby74": {
-      "when": "2026-01-28T19:05:51.939Z",
+      "when": "2026-01-28T20:02:20.176Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLmkdAgtxf3ahEmMWNY52BX3t1o7vb4aN5"
     },
     "tkbZcf67inA": {
-      "when": "2026-01-28T19:06:00.687Z",
+      "when": "2026-01-28T20:02:29.416Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLNlNx9Di_AxuSvXu4xRiy6qfx8KY-J-C9"
     },
     "_LGPkyw51pc": {
-      "when": "2026-01-28T19:06:05.890Z",
+      "when": "2026-01-28T20:02:34.763Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLcdXvEekPv1GRqbvjVf41TrYQhjHRO1_q"
     },
     "_9V_Hbe-N1A": {
-      "when": "2026-01-28T19:06:10.601Z",
+      "when": "2026-01-28T20:02:40.010Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLd7-bHaQwnthaNDpZ32TtYONGVk95-fhF"
     },
     "6JayoSnRgvs": {
-      "when": "2026-01-28T19:06:16.186Z",
+      "when": "2026-01-28T20:02:45.997Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PL3FW7Lu3i5JvBYuJvDuDZliJFv9ZDmKs_"
-    },
-    "hC-TmUr2F40": {
-      "when": "2026-01-28T19:06:27.816Z",
-      "skipped": true,
-      "reason": "no_transcript",
-      "playlist_id": "PLBEIBBdgAOArw0ljqpJoywBxXtSrkqVCt"
     }
   },
   "playlists": {
@@ -79,9 +73,6 @@
     },
     "PL3FW7Lu3i5JvBYuJvDuDZliJFv9ZDmKs_": {
       "latest_published_at": "2026-01-23T18:56:58.000Z"
-    },
-    "PLBEIBBdgAOArw0ljqpJoywBxXtSrkqVCt": {
-      "latest_published_at": "2026-01-21T11:01:20.000Z"
     }
   }
 }
