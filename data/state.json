@@ -1,85 +1,13 @@
 {
   "processed": {
-    "RECLTp_YxSU": {
-      "when": "2026-03-19T19:38:00.245Z",
-      "skipped": true,
-      "reason": "no_transcript",
-      "playlist_id": "PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW"
-    },
-    "re465UKn9tQ": {
-      "when": "2026-03-19T19:38:03.582Z",
-      "skipped": true,
-      "reason": "no_transcript",
-      "playlist_id": "PLkkA1LPpvlkjbuctKTaViIeIiZljzbqxW"
-    },
-    "g54AYWfi3MY": {
-      "when": "2026-03-19T19:38:06.378Z",
-      "skipped": true,
-      "reason": "no_transcript",
-      "playlist_id": "PLW0NGgv1qnfzRbBVRUFWxAwJbU1v5ET_R"
-    },
-    "0yIig3cpC1s": {
-      "when": "2026-03-19T19:38:12.417Z",
-      "skipped": true,
-      "reason": "no_transcript",
-      "playlist_id": "PLmkdAgtxf3ahEmMWNY52BX3t1o7vb4aN5"
-    },
-    "UJoP5chRwIQ": {
-      "when": "2026-03-19T19:38:20.256Z",
-      "skipped": true,
-      "reason": "no_transcript",
-      "playlist_id": "PLNlNx9Di_AxuSvXu4xRiy6qfx8KY-J-C9"
-    },
-    "ZMk3ztb66mc": {
-      "when": "2026-03-19T19:38:24.814Z",
-      "skipped": true,
-      "reason": "no_transcript",
-      "playlist_id": "PLcdXvEekPv1GRqbvjVf41TrYQhjHRO1_q"
-    },
-    "mDG_Hx3BSUE": {
-      "when": "2026-03-19T19:38:29.348Z",
-      "skipped": true,
-      "reason": "no_transcript",
-      "playlist_id": "PLd7-bHaQwnthaNDpZ32TtYONGVk95-fhF"
-    },
-    "Yw3cWzMcHaM": {
-      "when": "2026-03-19T19:38:34.871Z",
-      "skipped": true,
-      "reason": "no_transcript",
-      "playlist_id": "PL3FW7Lu3i5JvBYuJvDuDZliJFv9ZDmKs_"
-    },
     "uA7lrmyH_MA": {
-      "when": "2026-03-19T19:38:43.637Z",
+      "when": "2026-03-19T20:24:15.819Z",
       "skipped": true,
       "reason": "no_transcript",
       "playlist_id": "PLBEIBBdgAOArw0ljqpJoywBxXtSrkqVCt"
     }
   },
   "playlists": {
-    "PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW": {
-      "latest_published_at": "2026-03-19T12:00:51.000Z"
-    },
-    "PLkkA1LPpvlkjbuctKTaViIeIiZljzbqxW": {
-      "latest_published_at": "2026-03-18T08:01:00.000Z"
-    },
-    "PLW0NGgv1qnfzRbBVRUFWxAwJbU1v5ET_R": {
-      "latest_published_at": "2026-03-19T18:54:41.000Z"
-    },
-    "PLmkdAgtxf3ahEmMWNY52BX3t1o7vb4aN5": {
-      "latest_published_at": "2026-03-16T10:36:44.000Z"
-    },
-    "PLNlNx9Di_AxuSvXu4xRiy6qfx8KY-J-C9": {
-      "latest_published_at": "2026-03-16T10:00:46.000Z"
-    },
-    "PLcdXvEekPv1GRqbvjVf41TrYQhjHRO1_q": {
-      "latest_published_at": "2026-03-10T14:00:58.000Z"
-    },
-    "PLd7-bHaQwnthaNDpZ32TtYONGVk95-fhF": {
-      "latest_published_at": "2026-03-13T16:26:57.000Z"
-    },
-    "PL3FW7Lu3i5JvBYuJvDuDZliJFv9ZDmKs_": {
-      "latest_published_at": "2026-03-13T16:28:59.000Z"
-    },
     "PLBEIBBdgAOArw0ljqpJoywBxXtSrkqVCt": {
       "latest_published_at": "2026-03-17T19:22:21.000Z"
     }
